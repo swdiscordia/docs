@@ -1,122 +1,110 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "mint",
-  "name": "Mint Starter Kit",
-  "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
+  "theme": "maple",
+  "name": "ShapeShift",
+  "description": "A unified API for cross-chain swaps, asset management, and blockchain data across every major ecosystem.",
+  "logo": {
+    "light": "/images/logo-light.svg",
+    "dark": "/images/logo-dark.svg",
+    "href": "https://shapeshift.com"
   },
-  "favicon": "/favicon.svg",
+  "favicon": "/images/favicon.svg",
+  "colors": {
+    "primary": "#3B82F6",
+    "light": "#60A5FA",
+    "dark": "#2563EB"
+  },
+  "appearance": {
+    "default": "dark",
+    "strict": false
+  },
+  "background": {
+    "decoration": "gradient"
+  },
+  "styling": {
+    "eyebrows": "section",
+    "codeblocks": {
+      "theme": "dark"
+    }
+  },
+  "navbar": {
+    "links": [
+      { "label": "GitHub", "href": "https://github.com/shapeshift" },
+      { "label": "Discord", "href": "https://discord.gg/shapeshift" }
+    ],
+    "primary": {
+      "type": "button",
+      "label": "Get API Key",
+      "href": "https://shapeshift.com/developers"
+    }
+  },
   "navigation": {
     "tabs": [
       {
-        "tab": "Guides",
+        "tab": "Documentation",
+        "icon": "book",
         "groups": [
           {
-            "group": "Getting started",
+            "group": "Getting Started",
+            "icon": "play",
             "pages": [
-              "index",
-              "quickstart",
-              "development"
-            ]
-          },
-          {
-            "group": "Customization",
-            "pages": [
-              "essentials/settings",
-              "essentials/navigation"
-            ]
-          },
-          {
-            "group": "Writing content",
-            "pages": [
-              "essentials/markdown",
-              "essentials/code",
-              "essentials/images",
-              "essentials/reusable-snippets"
-            ]
-          },
-          {
-            "group": "AI tools",
-            "pages": [
-              "ai-tools/cursor",
-              "ai-tools/claude-code",
-              "ai-tools/windsurf"
+              "getting-started/introduction",
+              "getting-started/quickstart",
+              "getting-started/authentication",
+              "getting-started/asset-ids"
             ]
           }
         ]
       },
       {
-        "tab": "API reference",
+        "tab": "API Reference",
+        "icon": "square-terminal",
         "groups": [
           {
-            "group": "API documentation",
-            "pages": [
-              "api-reference/introduction"
-            ]
+            "group": "Overview",
+            "pages": ["api-reference/overview"]
           },
           {
-            "group": "Endpoint examples",
-            "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete",
-              "api-reference/endpoint/webhook"
-            ]
+            "group": "Chains",
+            "openapi": "openapi.yaml",
+            "pages": ["GET /v1/chains", "GET /v1/chains/count"]
+          },
+          {
+            "group": "Assets",
+            "openapi": "openapi.yaml",
+            "pages": ["GET /v1/assets", "GET /v1/assets/{assetId}"]
+          },
+          {
+            "group": "Swaps",
+            "openapi": "openapi.yaml",
+            "pages": ["GET /v1/swap/rates", "POST /v1/swap/quote"]
           }
         ]
       }
     ],
     "global": {
       "anchors": [
-        {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
-        },
-        {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
-        }
+        { "anchor": "API Status", "icon": "signal", "href": "https://status.shapeshift.com" },
+        { "anchor": "Support", "icon": "envelope", "href": "https://shapeshift.com/support" }
       ]
     }
   },
-  "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
-  },
-  "navbar": {
-    "links": [
-      {
-        "label": "Support",
-        "href": "mailto:hi@mintlify.com"
-      }
-    ],
-    "primary": {
-      "type": "button",
-      "label": "Dashboard",
-      "href": "https://dashboard.mintlify.com"
-    }
-  },
-  "contextual": {
-    "options": [
-     "copy",
-     "view",
-     "chatgpt",
-     "claude",
-     "perplexity",
-     "mcp",
-     "cursor",
-     "vscode"
-   ]
-  },
   "footer": {
     "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
+      "x": "https://x.com/ShapeShift",
+      "github": "https://github.com/shapeshift",
+      "discord": "https://discord.gg/shapeshift"
     }
-  }
+  },
+  "api": {
+    "openapi": "openapi.yaml",
+    "playground": { "display": "interactive" },
+    "examples": {
+      "languages": ["bash", "python", "javascript"],
+      "autogenerate": true
+    }
+  },
+  "contextual": { "options": ["copy", "view", "claude", "cursor"] },
+  "search": { "prompt": "Search ShapeShift docs..." },
+  "seo": { "indexing": "navigable" }
 }
