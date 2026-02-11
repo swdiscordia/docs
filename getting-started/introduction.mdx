@@ -1,0 +1,101 @@
+---
+title: "ShapeShift API"
+sidebarTitle: "Introduction"
+description: "A unified API for cross-chain swaps, asset management, and blockchain data across every major ecosystem."
+icon: "bolt"
+---
+
+<Warning>
+  The ShapeShift API is currently in **beta**. If you want early access or wish to integrate, please [contact us](https://shapeshift.com/developers).
+</Warning>
+
+## Quick Start
+
+Get up and running with the ShapeShift API in minutes.
+
+<CardGroup cols={2}>
+  <Card title="Installation" icon="download" href="/getting-started/quickstart">
+    Install the SDK and make your first API call in under 5 minutes
+  </Card>
+  <Card title="Authentication" icon="lock" href="/getting-started/authentication">
+    Learn how to authenticate your API requests with an API key
+  </Card>
+  <Card title="Asset IDs" icon="tag" href="/getting-started/asset-ids">
+    Understand CAIP-19 identifiers used across all endpoints
+  </Card>
+  <Card title="API Reference" icon="square-terminal" href="/api-reference/overview">
+    Explore all available endpoints with interactive examples
+  </Card>
+</CardGroup>
+
+## Installation
+
+<CodeGroup>
+```bash npm
+npm install @shapeshift/api-client
+```
+
+```bash yarn
+yarn add @shapeshift/api-client
+```
+
+```bash pnpm
+pnpm add @shapeshift/api-client
+```
+</CodeGroup>
+
+## Basic Usage
+
+```typescript
+import { ShapeShiftClient } from '@shapeshift/api-client';
+
+const client = new ShapeShiftClient({
+  apiKey: 'your-api-key',
+});
+
+// Get swap rates
+const rates = await client.swap.getRates({
+  sellAsset: 'eip155:1/slip44:60',
+  buyAsset: 'eip155:1/erc20:0xa0b86991c...',
+  sellAmount: '1000000000000000000',
+});
+
+console.log(rates);
+```
+
+## Core Features
+
+<CardGroup cols={2}>
+  <Card title="Chains" icon="link" href="/api-reference/overview#chains">
+    Query supported blockchains and their metadata across all major ecosystems
+  </Card>
+  <Card title="Assets" icon="coins" href="/api-reference/overview#assets">
+    Browse and search supported assets with CAIP-19 identifiers and filtering
+  </Card>
+  <Card title="Swap Rates" icon="arrows-rotate" href="/api-reference/overview#swaps">
+    Get real-time rates from multiple DEX aggregators in a single call
+  </Card>
+  <Card title="Swap Quotes" icon="file-contract" href="/api-reference/overview#swaps">
+    Generate executable transaction data ready for on-chain submission
+  </Card>
+</CardGroup>
+
+## Integration Workflow
+
+<Steps>
+  <Step title="Get your API key">
+    Request access to receive your \`X-API-Key\` credentials from the [developer portal](https://shapeshift.com/developers).
+  </Step>
+  <Step title="Query supported assets">
+    Use the [Assets endpoints](/api-reference/overview#assets) to find CAIP-19 asset IDs for your trading pairs.
+  </Step>
+  <Step title="Fetch swap rates">
+    Call \`GET /v1/swap/rates\` to compare rates across multiple DEX aggregators.
+  </Step>
+  <Step title="Generate a quote">
+    Use \`POST /v1/swap/quote\` to get executable transaction data with gas estimates and slippage protection.
+  </Step>
+  <Step title="Execute on-chain">
+    Submit the returned transaction object to the blockchain via your wallet or web3 provider.
+  </Step>
+</Steps>
