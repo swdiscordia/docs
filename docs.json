@@ -26,13 +26,12 @@
   },
   "navbar": {
     "links": [
-      { "label": "GitHub", "href": "https://github.com/shapeshift" },
-      { "label": "Discord", "href": "https://discord.gg/shapeshift" }
+      { "label": "Want to Integrate?", "href": "https://shapeshift.com/developers" }
     ],
     "primary": {
       "type": "button",
-      "label": "Get API Key",
-      "href": "https://shapeshift.com/developers"
+      "label": "Get Started",
+      "href": "/getting-started/quickstart"
     }
   },
   "navigation": {
@@ -66,8 +65,9 @@
     ],
     "global": {
       "anchors": [
-        { "anchor": "API Status", "icon": "signal", "href": "https://status.shapeshift.com" },
-        { "anchor": "Support", "icon": "envelope", "href": "https://shapeshift.com/support" }
+        { "anchor": "X", "icon": "x-twitter", "href": "https://x.com/ShapeShift" },
+        { "anchor": "Discord", "icon": "discord", "href": "https://discord.gg/shapeshift" },
+        { "anchor": "GitHub", "icon": "github", "href": "https://github.com/shapeshift" }
       ]
     }
   },
