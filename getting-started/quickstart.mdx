@@ -1,0 +1,136 @@
+---
+title: "Quick Start"
+sidebarTitle: "Quick Start"
+description: "Get up and running with the ShapeShift API in under 5 minutes."
+icon: "rocket"
+---
+
+## Prerequisites
+
+Before you begin, make sure you have:
+
+<Steps>
+  <Step title="An API Key">
+    Request one from the [ShapeShift developer portal](https://shapeshift.com/developers).
+  </Step>
+  <Step title="Node.js 18+ (optional)">
+    Required if using the JavaScript/TypeScript SDK. Otherwise, any HTTP client works.
+  </Step>
+</Steps>
+
+## Your First API Call
+
+Let's start by fetching the list of supported blockchains:
+
+<CodeGroup>
+```bash cURL
+curl -X GET "https://api.shapeshift.com/v1/chains" \
+  -H "X-API-Key: your-api-key" \
+  -H "Content-Type: application/json"
+```
+
+```python Python
+import requests
+
+response = requests.get(
+    "https://api.shapeshift.com/v1/chains",
+    headers={
+        "X-API-Key": "your-api-key",
+        "Content-Type": "application/json"
+    }
+)
+
+data = response.json()
+print(data)
+```
+
+```javascript JavaScript
+const response = await fetch("https://api.shapeshift.com/v1/chains", {
+  headers: {
+    "X-API-Key": "your-api-key",
+    "Content-Type": "application/json",
+  },
+});
+
+const data = await response.json();
+console.log(data);
+```
+</CodeGroup>
+
+### Example Response
+
+```json
+{
+  "chains": [
+    {
+      "chainId": "eip155:1",
+      "name": "Ethereum",
+      "nativeCurrency": "ETH",
+      "explorer": "https://etherscan.io"
+    },
+    {
+      "chainId": "eip155:137",
+      "name": "Polygon",
+      "nativeCurrency": "MATIC",
+      "explorer": "https://polygonscan.com"
+    },
+    {
+      "chainId": "eip155:42161",
+      "name": "Arbitrum One",
+      "nativeCurrency": "ETH",
+      "explorer": "https://arbiscan.io"
+    }
+  ]
+}
+```
+
+<Info>
+  All endpoints require the \`X-API-Key\` header for authentication. See the [Authentication](/getting-started/authentication) section for details.
+</Info>
+
+## Execute a Swap
+
+Now let's do something more interesting — get a swap quote:
+
+<Steps>
+  <Step title="Get rates">
+    First, compare rates across aggregators:
+    ```bash
+    curl -X GET "https://api.shapeshift.com/v1/swap/rates?\
+    sellAsset=eip155:1/slip44:60&\
+    buyAsset=eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48&\
+    sellAmount=1000000000000000000" \
+      -H "X-API-Key: your-api-key"
+    ```
+  </Step>
+  <Step title="Generate a quote">
+    Pick the best rate and generate executable transaction data:
+    ```bash
+    curl -X POST "https://api.shapeshift.com/v1/swap/quote" \
+      -H "X-API-Key: your-api-key" \
+      -H "Content-Type: application/json" \
+      -d '{
+        "sellAsset": "eip155:1/slip44:60",
+        "buyAsset": "eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "sellAmount": "1000000000000000000",
+        "senderAddress": "0x742d35Cc6634C0532925a3b844Bc9e7595f2bD65",
+        "receiverAddress": "0x742d35Cc6634C0532925a3b844Bc9e7595f2bD65",
+        "slippage": 0.5
+      }'
+    ```
+  </Step>
+  <Step title="Submit on-chain">
+    Use the returned \`transaction\` object to submit via your wallet or web3 provider.
+  </Step>
+</Steps>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Authentication" icon="lock" href="/getting-started/authentication">
+    Learn about API key management and security best practices
+  </Card>
+  <Card title="Asset IDs" icon="tag" href="/getting-started/asset-ids">
+    Understand the CAIP-19 format used for asset identification
+  </Card>
+</CardGroup>
