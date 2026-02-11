@@ -26,14 +26,8 @@
   },
   "navbar": {
     "links": [
-      {
-        "label": "GitHub",
-        "href": "https://github.com/shapeshift"
-      },
-      {
-        "label": "Discord",
-        "href": "https://discord.gg/shapeshift"
-      }
+      { "label": "GitHub", "href": "https://github.com/shapeshift" },
+      { "label": "Discord", "href": "https://discord.gg/shapeshift" }
     ],
     "primary": {
       "type": "button",
@@ -51,7 +45,7 @@
             "group": "Getting Started",
             "icon": "play",
             "pages": [
-              "getting-started/introduction",
+              "index",
               "getting-started/quickstart",
               "getting-started/authentication",
               "getting-started/asset-ids"
@@ -63,51 +57,17 @@
         "tab": "API Reference",
         "icon": "square-terminal",
         "groups": [
-          {
-            "group": "Overview",
-            "pages": [
-              "api-reference/overview"
-            ]
-          },
-          {
-            "group": "Chains",
-            "openapi": "openapi.yaml",
-            "pages": [
-              "GET /v1/chains",
-              "GET /v1/chains/count"
-            ]
-          },
-          {
-            "group": "Assets",
-            "openapi": "openapi.yaml",
-            "pages": [
-              "GET /v1/assets",
-              "GET /v1/assets/{assetId}"
-            ]
-          },
-          {
-            "group": "Swaps",
-            "openapi": "openapi.yaml",
-            "pages": [
-              "GET /v1/swap/rates",
-              "POST /v1/swap/quote"
-            ]
-          }
+          { "group": "Overview", "pages": ["api-reference/overview"] },
+          { "group": "Chains", "openapi": "openapi.yaml", "pages": ["GET /v1/chains", "GET /v1/chains/count"] },
+          { "group": "Assets", "openapi": "openapi.yaml", "pages": ["GET /v1/assets", "GET /v1/assets/{assetId}"] },
+          { "group": "Swaps", "openapi": "openapi.yaml", "pages": ["GET /v1/swap/rates", "POST /v1/swap/quote"] }
         ]
       }
     ],
     "global": {
       "anchors": [
-        {
-          "anchor": "API Status",
-          "icon": "signal",
-          "href": "https://status.shapeshift.com"
-        },
-        {
-          "anchor": "Support",
-          "icon": "envelope",
-          "href": "https://shapeshift.com/support"
-        }
+        { "anchor": "API Status", "icon": "signal", "href": "https://status.shapeshift.com" },
+        { "anchor": "Support", "icon": "envelope", "href": "https://shapeshift.com/support" }
       ]
     }
   },
@@ -120,14 +80,8 @@
   },
   "api": {
     "openapi": "openapi.yaml",
-    "playground": {
-      "display": "interactive"
-    }
+    "playground": { "display": "interactive" }
   },
-  "search": {
-    "prompt": "Search ShapeShift docs..."
-  },
-  "seo": {
-    "indexing": "navigable"
-  }
+  "search": { "prompt": "Search ShapeShift docs..." },
+  "seo": { "indexing": "navigable" }
 }
