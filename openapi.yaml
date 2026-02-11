@@ -1,0 +1,398 @@
+openapi: 3.1.0
+info:
+  title: ShapeShift API
+  description: A unified API for cross-chain swaps, asset management, and blockchain data.
+  version: "1.0.0"
+  contact:
+    name: ShapeShift Developer Support
+    url: https://shapeshift.com/support
+  license:
+    name: MIT
+
+servers:
+  - url: https://api.shapeshift.com
+    description: Production
+
+security:
+  - ApiKeyAuth: []
+
+tags:
+  - name: Chains
+    description: Query supported blockchains and their metadata
+  - name: Assets
+    description: Browse and search supported assets with CAIP-19 identifiers
+  - name: Swaps
+    description: Get rates and generate executable swap quotes
+
+paths:
+  /v1/chains:
+    get:
+      operationId: getChains
+      summary: List all supported chains
+      description: Returns a list of all blockchain networks currently supported by the ShapeShift API.
+      tags:
+        - Chains
+      responses:
+        "200":
+          description: Successfully retrieved the list of chains
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  chains:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Chain"
+              example:
+                chains:
+                  - chainId: "eip155:1"
+                    name: "Ethereum"
+                    nativeCurrency: "ETH"
+                    explorer: "https://etherscan.io"
+                  - chainId: "eip155:137"
+                    name: "Polygon"
+                    nativeCurrency: "MATIC"
+                    explorer: "https://polygonscan.com"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /v1/chains/count:
+    get:
+      operationId: getChainsCount
+      summary: Get total chain count
+      description: Returns the total number of supported blockchain networks.
+      tags:
+        - Chains
+      responses:
+        "200":
+          description: Successfully retrieved the chain count
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: integer
+                    example: 42
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /v1/assets:
+    get:
+      operationId: getAssets
+      summary: List supported assets
+      description: Returns a paginated list of all assets supported by the API.
+      tags:
+        - Assets
+      parameters:
+        - name: chainId
+          in: query
+          description: Filter by CAIP-2 chain ID
+          required: false
+          schema:
+            type: string
+            example: "eip155:1"
+        - name: search
+          in: query
+          description: Search by name or symbol
+          required: false
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: Max results (default 50, max 200)
+          required: false
+          schema:
+            type: integer
+            default: 50
+        - name: offset
+          in: query
+          description: Pagination offset
+          required: false
+          schema:
+            type: integer
+            default: 0
+      responses:
+        "200":
+          description: Successfully retrieved assets
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  assets:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Asset"
+                  total:
+                    type: integer
+                  limit:
+                    type: integer
+                  offset:
+                    type: integer
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /v1/assets/{assetId}:
+    get:
+      operationId: getAssetById
+      summary: Get asset details
+      description: Returns detailed information about a specific asset including market data.
+      tags:
+        - Assets
+      parameters:
+        - name: assetId
+          in: path
+          description: CAIP-19 asset identifier (URL-encoded)
+          required: true
+          schema:
+            type: string
+            example: "eip155:1/slip44:60"
+      responses:
+        "200":
+          description: Successfully retrieved asset details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AssetDetailed"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          description: Asset not found
+
+  /v1/swap/rates:
+    get:
+      operationId: getSwapRates
+      summary: Get swap rates
+      description: Queries multiple DEX aggregators and returns the best available rates.
+      tags:
+        - Swaps
+      parameters:
+        - name: sellAsset
+          in: query
+          description: CAIP-19 ID of asset to sell
+          required: true
+          schema:
+            type: string
+            example: "eip155:1/slip44:60"
+        - name: buyAsset
+          in: query
+          description: CAIP-19 ID of asset to buy
+          required: true
+          schema:
+            type: string
+        - name: sellAmount
+          in: query
+          description: Amount to sell in base units (wei, satoshi, etc.)
+          required: true
+          schema:
+            type: string
+            example: "1000000000000000000"
+      responses:
+        "200":
+          description: Successfully retrieved swap rates
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  rates:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/SwapRate"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /v1/swap/quote:
+    post:
+      operationId: postSwapQuote
+      summary: Generate swap quote
+      description: Generates executable transaction data for a swap. Quotes expire after a short time window.
+      tags:
+        - Swaps
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SwapQuoteRequest"
+      responses:
+        "200":
+          description: Successfully generated swap quote
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  quote:
+                    $ref: "#/components/schemas/SwapQuote"
+                  transaction:
+                    $ref: "#/components/schemas/Transaction"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: Your ShapeShift API key
+
+  schemas:
+    Chain:
+      type: object
+      properties:
+        chainId:
+          type: string
+          description: CAIP-2 chain identifier
+          example: "eip155:1"
+        name:
+          type: string
+          example: "Ethereum"
+        nativeCurrency:
+          type: string
+          example: "ETH"
+        explorer:
+          type: string
+          example: "https://etherscan.io"
+
+    Asset:
+      type: object
+      properties:
+        assetId:
+          type: string
+          description: CAIP-19 asset identifier
+          example: "eip155:1/slip44:60"
+        name:
+          type: string
+          example: "Ethereum"
+        symbol:
+          type: string
+          example: "ETH"
+        decimals:
+          type: integer
+          example: 18
+        chainId:
+          type: string
+          example: "eip155:1"
+        icon:
+          type: string
+
+    AssetDetailed:
+      allOf:
+        - $ref: "#/components/schemas/Asset"
+        - type: object
+          properties:
+            marketData:
+              type: object
+              properties:
+                price:
+                  type: string
+                  example: "3245.67"
+                marketCap:
+                  type: string
+                volume24h:
+                  type: string
+                changePercent24h:
+                  type: string
+
+    SwapRate:
+      type: object
+      properties:
+        source:
+          type: string
+          example: "0x"
+        buyAmount:
+          type: string
+        sellAmount:
+          type: string
+        rate:
+          type: string
+          example: "3245.67"
+        estimatedGas:
+          type: string
+
+    SwapQuoteRequest:
+      type: object
+      required: [sellAsset, buyAsset, sellAmount, senderAddress, receiverAddress]
+      properties:
+        sellAsset:
+          type: string
+          example: "eip155:1/slip44:60"
+        buyAsset:
+          type: string
+        sellAmount:
+          type: string
+        senderAddress:
+          type: string
+        receiverAddress:
+          type: string
+        slippage:
+          type: number
+          default: 0.5
+        preferredSource:
+          type: string
+
+    SwapQuote:
+      type: object
+      properties:
+        sellAsset:
+          type: string
+        buyAsset:
+          type: string
+        sellAmount:
+          type: string
+        buyAmount:
+          type: string
+        rate:
+          type: string
+        source:
+          type: string
+        estimatedGas:
+          type: string
+        expiresAt:
+          type: string
+          format: date-time
+
+    Transaction:
+      type: object
+      properties:
+        to:
+          type: string
+        value:
+          type: string
+        data:
+          type: string
+        gasLimit:
+          type: string
+        chainId:
+          type: integer
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+
+  responses:
+    Unauthorized:
+      description: Invalid or missing API key
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    RateLimited:
+      description: Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
