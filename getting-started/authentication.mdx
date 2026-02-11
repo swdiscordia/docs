@@ -1,0 +1,117 @@
+---
+title: "Authentication"
+sidebarTitle: "Authentication"
+description: "All API requests require authentication via an API key passed in the request headers."
+icon: "lock"
+---
+
+## API Key
+
+Include your API key in every request using the \`X-API-Key\` header:
+
+```bash
+curl -X GET "https://api.shapeshift.com/v1/chains" \
+  -H "X-API-Key: sk_live_your_api_key_here"
+```
+
+<Warning>
+  **Keep your API key secret.** Never expose it in client-side code, public repositories, or browser requests. Use environment variables and server-side proxies.
+</Warning>
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Use environment variables" icon="key">
+    Store your API key in environment variables rather than hardcoding it:
+
+    ```bash .env
+    SHAPESHIFT_API_KEY=sk_live_your_api_key_here
+    ```
+
+    ```javascript
+    const client = new ShapeShiftClient({
+      apiKey: process.env.SHAPESHIFT_API_KEY,
+    });
+    ```
+  </Accordion>
+
+  <Accordion title="Server-side only" icon="server">
+    Always make API calls from your server, never from the browser. If you need to expose swap data to your frontend, create a proxy endpoint on your server.
+
+    ```javascript
+    // Server-side (Express example)
+    app.get('/api/rates', async (req, res) => {
+      const rates = await shapeshift.swap.getRates(req.query);
+      res.json(rates);
+    });
+
+    // Never in the browser
+    // fetch('https://api.shapeshift.com/v1/swap/rates', {
+    //   headers: { 'X-API-Key': 'sk_live_...' }
+    // });
+    ```
+  </Accordion>
+
+  <Accordion title="Rotate keys regularly" icon="arrows-rotate">
+    Periodically rotate your API keys via the developer portal. If you suspect a key has been compromised, revoke it immediately.
+  </Accordion>
+</AccordionGroup>
+
+## Rate Limiting
+
+API requests are rate-limited to **100 requests per minute** per API key. If you exceed this limit, you'll receive a \`429 Too Many Requests\` response:
+
+```json
+{
+  "error": {
+    "code": "RATE_LIMITED",
+    "message": "Rate limit exceeded. Please wait and try again."
+  }
+}
+```
+
+<Tip>
+  Implement exponential backoff in your retry logic to handle rate limiting gracefully.
+</Tip>
+
+## Error Responses
+
+### 401 Unauthorized
+
+Returned when the API key is missing or invalid:
+
+```json
+{
+  "error": {
+    "code": "UNAUTHORIZED",
+    "message": "Invalid or missing API key"
+  }
+}
+```
+
+### 403 Forbidden
+
+Returned when the API key doesn't have permissions for the requested resource:
+
+```json
+{
+  "error": {
+    "code": "FORBIDDEN",
+    "message": "API key does not have access to this resource"
+  }
+}
+```
+
+## Getting an API Key
+
+<Steps>
+  <Step title="Sign up">
+    Create an account on the [ShapeShift developer portal](https://shapeshift.com/developers).
+  </Step>
+  <Step title="Create a project">
+    Set up a new project and configure your allowed origins and rate limits.
+  </Step>
+  <Step title="Generate a key">
+    Generate an API key from your project dashboard. Copy it immediately — it won't be shown again.
+  </Step>
+</Steps>
