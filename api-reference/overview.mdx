@@ -1,0 +1,104 @@
+---
+title: "API Reference"
+sidebarTitle: "Overview"
+description: "Complete API documentation for the ShapeShift cross-chain swap infrastructure."
+icon: "square-terminal"
+---
+
+## Base URL
+
+All API requests should be made to:
+
+```
+https://api.shapeshift.com
+```
+
+## Authentication
+
+All endpoints require an API key passed via the \`X-API-Key\` header. See [Authentication](/getting-started/authentication) for details.
+
+```bash
+curl -X GET "https://api.shapeshift.com/v1/chains" \
+  -H "X-API-Key: your-api-key"
+```
+
+## Response Format
+
+All API responses follow a consistent format:
+
+```json
+{
+  "success": true,
+  "data": { ... },
+  "error": null
+}
+```
+
+On errors:
+
+```json
+{
+  "error": {
+    "code": "ERROR_CODE",
+    "message": "Human-readable error description"
+  }
+}
+```
+
+## Endpoints Overview
+
+### Chains
+
+Query supported blockchains and their metadata.
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| \`GET\` | \`/v1/chains\` | List all supported blockchains |
+| \`GET\` | \`/v1/chains/count\` | Get total chain count |
+
+### Assets
+
+Browse and search supported assets using CAIP-19 identifiers.
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| \`GET\` | \`/v1/assets\` | List supported assets with filtering and pagination |
+| \`GET\` | \`/v1/assets/{assetId}\` | Get detailed info about a specific asset |
+
+### Swaps
+
+Get rates from multiple DEX aggregators and generate executable swap quotes.
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| \`GET\` | \`/v1/swap/rates\` | Retrieve rates from multiple DEX aggregators |
+| \`POST\` | \`/v1/swap/quote\` | Generate executable transaction data |
+
+## Error Codes
+
+| Code | HTTP Status | Description |
+|------|-------------|-------------|
+| \`UNAUTHORIZED\` | 401 | Invalid or missing API key |
+| \`FORBIDDEN\` | 403 | API key lacks required permissions |
+| \`NOT_FOUND\` | 404 | Resource not found |
+| \`INVALID_PARAMS\` | 400 | Invalid or missing request parameters |
+| \`RATE_LIMITED\` | 429 | Too many requests |
+| \`INTERNAL_ERROR\` | 500 | Unexpected server error |
+
+## SDKs
+
+<CardGroup cols={3}>
+  <Card title="JavaScript / TypeScript" icon="js">
+    \`\`\`bash
+    npm install @shapeshift/api-client
+    \`\`\`
+  </Card>
+  <Card title="Python" icon="python">
+    \`\`\`bash
+    pip install shapeshift-api
+    \`\`\`
+  </Card>
+  <Card title="REST API" icon="globe">
+    Use any HTTP client with the endpoints documented below.
+  </Card>
+</CardGroup>
