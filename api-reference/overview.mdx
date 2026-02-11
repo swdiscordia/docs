@@ -1,21 +1,11 @@
 ---
 title: "API Reference"
-sidebarTitle: "Overview"
 description: "Complete API documentation for the ShapeShift cross-chain swap infrastructure."
-icon: "square-terminal"
 ---
-
-## Base URL
-
-All API requests should be made to:
-
-```
-https://api.shapeshift.com
-```
 
 ## Authentication
 
-All endpoints require an API key passed via the \`X-API-Key\` header. See [Authentication](/getting-started/authentication) for details.
+The API uses key-based authentication. Pass your API key via the `X-API-Key` header. For EIP-7702 mode, you sign authorizations with your wallet. For non-7702 modes, you sign or submit transactions directly.
 
 ```bash
 curl -X GET "https://api.shapeshift.com/v1/chains" \
@@ -24,26 +14,30 @@ curl -X GET "https://api.shapeshift.com/v1/chains" \
 
 ## Response Format
 
-All API responses follow a consistent format:
+All API responses follow this format:
 
 ```json
 {
-  "success": true,
-  "data": { ... },
-  "error": null
-}
-```
-
-On errors:
-
-```json
-{
+  "success": boolean,
+  "data": object | null,
   "error": {
     "code": "ERROR_CODE",
     "message": "Human-readable error description"
   }
 }
 ```
+
+## Error Handling
+
+| Status | Code | Description |
+|--------|------|-------------|
+| 200/201 | — | Success |
+| 400 | `INVALID_PARAMS` | Invalid or missing request parameters |
+| 401 | `UNAUTHORIZED` | Invalid or missing API key |
+| 403 | `FORBIDDEN` | API key lacks required permissions |
+| 404 | `NOT_FOUND` | Resource not found |
+| 429 | `RATE_LIMITED` | Too many requests |
+| 500 | `INTERNAL_ERROR` | Unexpected server error |
 
 ## Endpoints Overview
 
@@ -53,8 +47,8 @@ Query supported blockchains and their metadata.
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| \`GET\` | \`/v1/chains\` | List all supported blockchains |
-| \`GET\` | \`/v1/chains/count\` | Get total chain count |
+| `GET` | `/v1/chains` | List all supported blockchains |
+| `GET` | `/v1/chains/count` | Get total chain count |
 
 ### Assets
 
@@ -62,43 +56,14 @@ Browse and search supported assets using CAIP-19 identifiers.
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| \`GET\` | \`/v1/assets\` | List supported assets with filtering and pagination |
-| \`GET\` | \`/v1/assets/{assetId}\` | Get detailed info about a specific asset |
+| `GET` | `/v1/assets` | List supported assets with filtering and pagination |
+| `GET` | `/v1/assets/{assetId}` | Get detailed info about a specific asset |
 
 ### Swaps
 
-Get rates from multiple DEX aggregators and generate executable swap quotes.
+Get real-time swap rates and generate optimized quotes.
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| \`GET\` | \`/v1/swap/rates\` | Retrieve rates from multiple DEX aggregators |
-| \`POST\` | \`/v1/swap/quote\` | Generate executable transaction data |
-
-## Error Codes
-
-| Code | HTTP Status | Description |
-|------|-------------|-------------|
-| \`UNAUTHORIZED\` | 401 | Invalid or missing API key |
-| \`FORBIDDEN\` | 403 | API key lacks required permissions |
-| \`NOT_FOUND\` | 404 | Resource not found |
-| \`INVALID_PARAMS\` | 400 | Invalid or missing request parameters |
-| \`RATE_LIMITED\` | 429 | Too many requests |
-| \`INTERNAL_ERROR\` | 500 | Unexpected server error |
-
-## SDKs
-
-<CardGroup cols={3}>
-  <Card title="JavaScript / TypeScript" icon="js">
-    \`\`\`bash
-    npm install @shapeshift/api-client
-    \`\`\`
-  </Card>
-  <Card title="Python" icon="python">
-    \`\`\`bash
-    pip install shapeshift-api
-    \`\`\`
-  </Card>
-  <Card title="REST API" icon="globe">
-    Use any HTTP client with the endpoints documented below.
-  </Card>
-</CardGroup>
+| `GET` | `/v1/swap/rates` | Get current swap rates between asset pairs |
+| `POST` | `/v1/swap/quote` | Generate an optimized swap quote |
