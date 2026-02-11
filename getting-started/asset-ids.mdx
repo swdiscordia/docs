@@ -1,0 +1,104 @@
+---
+title: "Asset IDs (CAIP-19)"
+sidebarTitle: "Asset IDs"
+description: "ShapeShift uses the CAIP-19 standard for universally identifying assets across blockchains."
+icon: "tag"
+---
+
+## Format
+
+Asset IDs follow the [CAIP-19](https://github.com/ChainAgnostic/CAIPs/blob/main/CAIPs/caip-19.md) standard:
+
+```
+{namespace}:{chainId}/{assetType}:{assetReference}
+```
+
+This format ensures every asset has a globally unique identifier, regardless of which chain it lives on.
+
+## Common Examples
+
+| Asset | CAIP-19 ID | Description |
+|-------|-----------|-------------|
+| **ETH** | \`eip155:1/slip44:60\` | Native Ethereum |
+| **USDC (Ethereum)** | \`eip155:1/erc20:0xa0b86991c...\` | USDC on Ethereum |
+| **BTC** | \`bip122:000000000019d6689c.../slip44:0\` | Native Bitcoin |
+| **MATIC** | \`eip155:137/slip44:966\` | Native Polygon |
+| **USDC (Polygon)** | \`eip155:137/erc20:0x2791Bca...\` | USDC on Polygon |
+| **ARB** | \`eip155:42161/slip44:9001\` | Native Arbitrum |
+
+## Breakdown
+
+<AccordionGroup>
+  <Accordion title="Namespace" icon="globe">
+    The chain standard. Common values:
+
+    - \`eip155\` — EVM-compatible chains (Ethereum, Polygon, Arbitrum, etc.)
+    - \`bip122\` — Bitcoin and UTXO-based chains
+    - \`cosmos\` — Cosmos ecosystem chains
+    - \`solana\` — Solana
+  </Accordion>
+
+  <Accordion title="Chain ID" icon="link">
+    The specific chain within the namespace:
+
+    - \`1\` — Ethereum Mainnet
+    - \`137\` — Polygon
+    - \`42161\` — Arbitrum One
+    - \`10\` — Optimism
+    - \`8453\` — Base
+    - \`43114\` — Avalanche C-Chain
+  </Accordion>
+
+  <Accordion title="Asset Type" icon="coins">
+    How the asset is defined on-chain:
+
+    - \`slip44\` — Native chain currency (ETH, BTC, MATIC, etc.)
+    - \`erc20\` — ERC-20 tokens on EVM chains
+    - \`erc721\` — NFTs (not currently supported for swaps)
+  </Accordion>
+
+  <Accordion title="Asset Reference" icon="fingerprint">
+    Unique identifier within the asset type:
+
+    - For \`slip44\`: The registered coin type number
+    - For \`erc20\`: The token contract address
+  </Accordion>
+</AccordionGroup>
+
+## URL Encoding
+
+When using asset IDs in URL paths or query parameters, remember to URL-encode the special characters:
+
+```bash
+# The forward slash needs to be encoded as %2F
+curl "https://api.shapeshift.com/v1/assets/eip155:1%2Fslip44:60" \
+  -H "X-API-Key: your-api-key"
+```
+
+<Tip>
+  Use the [\`GET /v1/assets\`](/api-reference/overview#assets) endpoint to look up the correct CAIP-19 ID for any supported asset, so you don't have to construct them manually.
+</Tip>
+
+## Finding Asset IDs
+
+The easiest way to find an asset ID is to search for it:
+
+```bash
+# Search by name or symbol
+curl "https://api.shapeshift.com/v1/assets?search=usdc&chainId=eip155:1" \
+  -H "X-API-Key: your-api-key"
+```
+
+```json
+{
+  "assets": [
+    {
+      "assetId": "eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+      "name": "USD Coin",
+      "symbol": "USDC",
+      "decimals": 6,
+      "chainId": "eip155:1"
+    }
+  ]
+}
+```
