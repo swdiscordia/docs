@@ -5,19 +5,6 @@ description: "Get up and running with the ShapeShift API in under 5 minutes."
 icon: "rocket"
 ---
 
-## Prerequisites
-
-Before you begin, make sure you have:
-
-<Steps>
-  <Step title="An API Key">
-    Request one from the [ShapeShift developer portal](https://shapeshift.com/developers).
-  </Step>
-  <Step title="Node.js 18+ (optional)">
-    Required if using the JavaScript/TypeScript SDK. Otherwise, any HTTP client works.
-  </Step>
-</Steps>
-
 ## Your First API Call
 
 Let's start by fetching the list of supported blockchains:
@@ -65,35 +52,12 @@ console.log(data);
       "type": "evm",
       "symbol": "ETH",
       "precision": 18,
-      "color": "#627EEA",
+      "color": "#5C6BC0",
+      "icon": "https://rawcdn.githack.com/trustwallet/assets/.../ethereum/info/logo.png",
       "explorer": "https://etherscan.io",
       "explorerAddressLink": "https://etherscan.io/address/",
       "explorerTxLink": "https://etherscan.io/tx/",
       "nativeAssetId": "eip155:1/slip44:60"
-    },
-    {
-      "chainId": "eip155:137",
-      "name": "Polygon",
-      "type": "evm",
-      "symbol": "MATIC",
-      "precision": 18,
-      "color": "#8247E5",
-      "explorer": "https://polygonscan.com",
-      "explorerAddressLink": "https://polygonscan.com/address/",
-      "explorerTxLink": "https://polygonscan.com/tx/",
-      "nativeAssetId": "eip155:137/slip44:966"
-    },
-    {
-      "chainId": "eip155:42161",
-      "name": "Arbitrum One",
-      "type": "evm",
-      "symbol": "ETH",
-      "precision": 18,
-      "color": "#28A0F0",
-      "explorer": "https://arbiscan.io",
-      "explorerAddressLink": "https://arbiscan.io/address/",
-      "explorerTxLink": "https://arbiscan.io/tx/",
-      "nativeAssetId": "eip155:42161/slip44:9001"
     }
   ],
   "timestamp": 1700000000
@@ -127,12 +91,11 @@ Now let's do something more interesting — get a swap quote:
       -H "Content-Type: application/json" \
       -d '{
         "sellAssetId": "eip155:1/slip44:60",
-        "buyAssetId": "eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "buyAssetId": "bip122:000000000019d6689c085ae165831e93/slip44:0",
         "sellAmountCryptoBaseUnit": "1000000000000000000",
-        "receiveAddress": "0x742d35Cc6634C0532925a3b844Bc9e7595f2bD65",
-        "swapperName": "THORChain",
-        "sendAddress": "0x742d35Cc6634C0532925a3b844Bc9e7595f2bD65",
-        "slippageTolerancePercentageDecimal": "0.005"
+        "swapperName": "Relay",
+        "receiveAddress": "bc1q...",
+        "sendAddress": "0x..."
       }'
     ```
   </Step>
