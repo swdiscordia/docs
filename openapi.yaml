@@ -124,6 +124,7 @@ paths:
             type: number
             default: 0
             minimum: 0
+            nullable: true
       responses:
         "200":
           description: Successfully retrieved assets
@@ -181,6 +182,7 @@ paths:
           required: true
           schema:
             type: string
+            minLength: 1
             example: "eip155:1/slip44:60"
         - name: buyAssetId
           in: query
@@ -188,6 +190,7 @@ paths:
           required: true
           schema:
             type: string
+            minLength: 1
             example: "eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
         - name: sellAmountCryptoBaseUnit
           in: query
@@ -204,6 +207,7 @@ paths:
           schema:
             type: string
             pattern: "^(?:\\d+)(?:\\.\\d+)?$"
+            example: "0.01"
         - name: allowMultiHop
           in: query
           description: Allow multi-hop swaps for better rates
@@ -389,6 +393,13 @@ components:
 
     Rate:
       type: object
+      required:
+        - swapperName
+        - rate
+        - buyAmountCryptoBaseUnit
+        - sellAmountCryptoBaseUnit
+        - steps
+        - affiliateBps
       properties:
         swapperName:
           type: string
@@ -420,6 +431,9 @@ components:
           description: Network fee in base units
         error:
           type: object
+          required:
+            - code
+            - message
           properties:
             code:
               type: string
@@ -437,26 +451,37 @@ components:
       properties:
         sellAssetId:
           type: string
+          minLength: 1
           description: CAIP-19 ID of asset to sell
           example: "eip155:1/slip44:60"
         buyAssetId:
           type: string
+          minLength: 1
           description: CAIP-19 ID of asset to buy
+          example: "bip122:000000000019d6689c085ae165831e93/slip44:0"
         sellAmountCryptoBaseUnit:
           type: string
+          minLength: 1
           description: Amount to sell in base units
+          example: "1000000000000000000"
         receiveAddress:
           type: string
+          minLength: 1
           description: Address to receive the bought asset
+          example: "bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq"
         swapperName:
           type: string
+          minLength: 1
           description: Name of the swapper to use (from rates response)
+          example: "Relay"
         sendAddress:
           type: string
           description: Address sending the sell asset (optional)
+          example: "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"
         slippageTolerancePercentageDecimal:
           type: string
           description: Slippage tolerance as a decimal
+          example: "0.01"
         allowMultiHop:
           type: boolean
           description: Allow multi-hop swaps
@@ -543,6 +568,10 @@ components:
           description: The DEX or protocol used for this step
         transactionData:
           type: object
+          required:
+            - to
+            - data
+            - value
           properties:
             to:
               type: string
