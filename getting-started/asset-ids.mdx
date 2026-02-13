@@ -71,8 +71,7 @@ When using asset IDs in URL paths or query parameters, remember to URL-encode th
 
 ```bash
 # The forward slash needs to be encoded as %2F
-curl "https://api.shapeshift.com/v1/assets/eip155:1%2Fslip44:60" \
-  -H "X-API-Key: your-api-key"
+curl "https://api.shapeshift.com/v1/assets/eip155:1%2Fslip44:60"
 ```
 
 <Tip>
@@ -84,9 +83,8 @@ curl "https://api.shapeshift.com/v1/assets/eip155:1%2Fslip44:60" \
 The easiest way to find an asset ID is to search for it:
 
 ```bash
-# Search by name or symbol
-curl "https://api.shapeshift.com/v1/assets?search=usdc&chainId=eip155:1" \
-  -H "X-API-Key: your-api-key"
+# Filter assets by chain
+curl "https://api.shapeshift.com/v1/assets?chainId=eip155:1&limit=100"
 ```
 
 ```json
@@ -94,11 +92,17 @@ curl "https://api.shapeshift.com/v1/assets?search=usdc&chainId=eip155:1" \
   "assets": [
     {
       "assetId": "eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+      "chainId": "eip155:1",
       "name": "USD Coin",
       "symbol": "USDC",
-      "decimals": 6,
-      "chainId": "eip155:1"
+      "precision": 6,
+      "color": "#2775CA",
+      "icon": "https://assets.coincap.io/assets/icons/usdc.png",
+      "explorer": "https://etherscan.io",
+      "explorerAddressLink": "https://etherscan.io/address/",
+      "explorerTxLink": "https://etherscan.io/tx/"
     }
-  ]
+  ],
+  "timestamp": 1700000000
 }
 ```

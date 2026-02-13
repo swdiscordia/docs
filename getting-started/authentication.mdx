@@ -1,16 +1,16 @@
 ---
 title: "Authentication"
 sidebarTitle: "Authentication"
-description: "All API requests require authentication via an API key passed in the request headers."
+description: "Swap endpoints require authentication via an API key passed in the request headers."
 icon: "lock"
 ---
 
 ## API Key
 
-Include your API key in every request using the \`X-API-Key\` header:
+Swap endpoints (`/v1/swap/rates` and `/v1/swap/quote`) require your API key in the \`X-API-Key\` header. Chains and assets endpoints are publicly accessible without authentication.
 
 ```bash
-curl -X GET "https://api.shapeshift.com/v1/chains" \
+curl -X GET "https://api.shapeshift.com/v1/swap/rates?sellAssetId=eip155:1/slip44:60&buyAssetId=eip155:1/erc20:0xa0b86991c...&sellAmountCryptoBaseUnit=1000000000000000000" \
   -H "X-API-Key: sk_live_your_api_key_here"
 ```
 

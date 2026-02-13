@@ -25,7 +25,6 @@ Let's start by fetching the list of supported blockchains:
 <CodeGroup>
 ```bash cURL
 curl -X GET "https://api.shapeshift.com/v1/chains" \
-  -H "X-API-Key: your-api-key" \
   -H "Content-Type: application/json"
 ```
 
@@ -35,7 +34,6 @@ import requests
 response = requests.get(
     "https://api.shapeshift.com/v1/chains",
     headers={
-        "X-API-Key": "your-api-key",
         "Content-Type": "application/json"
     }
 )
@@ -47,7 +45,6 @@ print(data)
 ```javascript JavaScript
 const response = await fetch("https://api.shapeshift.com/v1/chains", {
   headers: {
-    "X-API-Key": "your-api-key",
     "Content-Type": "application/json",
   },
 });
@@ -65,27 +62,46 @@ console.log(data);
     {
       "chainId": "eip155:1",
       "name": "Ethereum",
-      "nativeCurrency": "ETH",
-      "explorer": "https://etherscan.io"
+      "type": "evm",
+      "symbol": "ETH",
+      "precision": 18,
+      "color": "#627EEA",
+      "explorer": "https://etherscan.io",
+      "explorerAddressLink": "https://etherscan.io/address/",
+      "explorerTxLink": "https://etherscan.io/tx/",
+      "nativeAssetId": "eip155:1/slip44:60"
     },
     {
       "chainId": "eip155:137",
       "name": "Polygon",
-      "nativeCurrency": "MATIC",
-      "explorer": "https://polygonscan.com"
+      "type": "evm",
+      "symbol": "MATIC",
+      "precision": 18,
+      "color": "#8247E5",
+      "explorer": "https://polygonscan.com",
+      "explorerAddressLink": "https://polygonscan.com/address/",
+      "explorerTxLink": "https://polygonscan.com/tx/",
+      "nativeAssetId": "eip155:137/slip44:966"
     },
     {
       "chainId": "eip155:42161",
       "name": "Arbitrum One",
-      "nativeCurrency": "ETH",
-      "explorer": "https://arbiscan.io"
+      "type": "evm",
+      "symbol": "ETH",
+      "precision": 18,
+      "color": "#28A0F0",
+      "explorer": "https://arbiscan.io",
+      "explorerAddressLink": "https://arbiscan.io/address/",
+      "explorerTxLink": "https://arbiscan.io/tx/",
+      "nativeAssetId": "eip155:42161/slip44:9001"
     }
-  ]
+  ],
+  "timestamp": 1700000000
 }
 ```
 
 <Info>
-  All endpoints require the \`X-API-Key\` header for authentication. See the [Authentication](/getting-started/authentication) section for details.
+  Only **swap endpoints** (`/v1/swap/rates` and `/v1/swap/quote`) require the \`X-API-Key\` header for authentication. Chains and assets endpoints are publicly accessible. See the [Authentication](/getting-started/authentication) section for details.
 </Info>
 
 ## Execute a Swap
@@ -97,9 +113,9 @@ Now let's do something more interesting — get a swap quote:
     First, compare rates across aggregators:
     ```bash
     curl -X GET "https://api.shapeshift.com/v1/swap/rates?\
-    sellAsset=eip155:1/slip44:60&\
-    buyAsset=eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48&\
-    sellAmount=1000000000000000000" \
+    sellAssetId=eip155:1/slip44:60&\
+    buyAssetId=eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48&\
+    sellAmountCryptoBaseUnit=1000000000000000000" \
       -H "X-API-Key: your-api-key"
     ```
   </Step>
@@ -110,17 +126,18 @@ Now let's do something more interesting — get a swap quote:
       -H "X-API-Key: your-api-key" \
       -H "Content-Type: application/json" \
       -d '{
-        "sellAsset": "eip155:1/slip44:60",
-        "buyAsset": "eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-        "sellAmount": "1000000000000000000",
-        "senderAddress": "0x742d35Cc6634C0532925a3b844Bc9e7595f2bD65",
-        "receiverAddress": "0x742d35Cc6634C0532925a3b844Bc9e7595f2bD65",
-        "slippage": 0.5
+        "sellAssetId": "eip155:1/slip44:60",
+        "buyAssetId": "eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "sellAmountCryptoBaseUnit": "1000000000000000000",
+        "receiveAddress": "0x742d35Cc6634C0532925a3b844Bc9e7595f2bD65",
+        "swapperName": "THORChain",
+        "sendAddress": "0x742d35Cc6634C0532925a3b844Bc9e7595f2bD65",
+        "slippageTolerancePercentageDecimal": "0.005"
       }'
     ```
   </Step>
   <Step title="Submit on-chain">
-    Use the returned \`transaction\` object to submit via your wallet or web3 provider.
+    Use the returned \`steps[].transactionData\` object to submit via your wallet or web3 provider.
   </Step>
 </Steps>
 
