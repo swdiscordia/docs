@@ -40,13 +40,13 @@ const client = new ShapeShiftAPI({
 const chains = await client.getChains();
 console.log(chains);
 
-// Get a swap quote
-const quote = await client.getSwapQuote({
-  sellAsset: "eip155:1/slip44:60",       // ETH on Ethereum
-  buyAsset: "eip155:137/slip44:966",      // MATIC on Polygon
-  sellAmount: "1000000000000000000",       // 1 ETH in wei
+// Get swap rates
+const rates = await client.getSwapRates({
+  sellAssetId: "eip155:1/slip44:60",                // ETH on Ethereum
+  buyAssetId: "eip155:137/slip44:966",               // MATIC on Polygon
+  sellAmountCryptoBaseUnit: "1000000000000000000",   // 1 ETH in wei
 });
-console.log(quote);
+console.log(rates);
 ```
 
 ## Core Components

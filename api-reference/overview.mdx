@@ -5,21 +5,19 @@ description: "Complete API documentation for the ShapeShift cross-chain swap inf
 
 ## Authentication
 
-The API uses key-based authentication. Pass your API key via the `X-API-Key` header. For EIP-7702 mode, you sign authorizations with your wallet. For non-7702 modes, you sign or submit transactions directly.
+Swap endpoints require key-based authentication. Pass your API key via the `X-API-Key` header. Chains and assets endpoints are publicly accessible.
 
 ```bash
-curl -X GET "https://api.shapeshift.com/v1/chains" \
+curl -X GET "https://api.shapeshift.com/v1/swap/rates?sellAssetId=...&buyAssetId=...&sellAmountCryptoBaseUnit=..." \
   -H "X-API-Key: your-api-key"
 ```
 
 ## Response Format
 
-All API responses follow this format:
+Successful responses return the data directly. Error responses follow this format:
 
 ```json
 {
-  "success": boolean,
-  "data": object | null,
   "error": {
     "code": "ERROR_CODE",
     "message": "Human-readable error description"

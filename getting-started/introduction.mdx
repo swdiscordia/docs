@@ -55,9 +55,9 @@ const client = new ShapeShiftClient({
 
 // Get swap rates
 const rates = await client.swap.getRates({
-  sellAsset: 'eip155:1/slip44:60',
-  buyAsset: 'eip155:1/erc20:0xa0b86991c...',
-  sellAmount: '1000000000000000000',
+  sellAssetId: 'eip155:1/slip44:60',
+  buyAssetId: 'eip155:1/erc20:0xa0b86991c...',
+  sellAmountCryptoBaseUnit: '1000000000000000000',
 });
 
 console.log(rates);

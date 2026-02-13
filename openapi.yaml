@@ -12,9 +12,8 @@ info:
 servers:
   - url: https://api.shapeshift.com
     description: Production
-
-security:
-  - ApiKeyAuth: []
+  - url: http://localhost:3001
+    description: Local
 
 tags:
   - name: Chains
@@ -28,8 +27,8 @@ paths:
   /v1/chains:
     get:
       operationId: getChains
-      summary: List all supported chains
-      description: Returns a list of all blockchain networks currently supported by the ShapeShift API.
+      summary: List supported chains
+      description: Returns a list of all blockchain networks currently supported by the ShapeShift API, sorted alphabetically.
       tags:
         - Chains
       responses:
@@ -44,25 +43,37 @@ paths:
                     type: array
                     items:
                       $ref: "#/components/schemas/Chain"
+                  timestamp:
+                    type: number
               example:
                 chains:
                   - chainId: "eip155:1"
                     name: "Ethereum"
-                    nativeCurrency: "ETH"
+                    type: "evm"
+                    symbol: "ETH"
+                    precision: 18
+                    color: "#627EEA"
+                    icon: "https://assets.coincap.io/assets/icons/eth.png"
                     explorer: "https://etherscan.io"
+                    explorerAddressLink: "https://etherscan.io/address/"
+                    explorerTxLink: "https://etherscan.io/tx/"
+                    nativeAssetId: "eip155:1/slip44:60"
                   - chainId: "eip155:137"
                     name: "Polygon"
-                    nativeCurrency: "MATIC"
+                    type: "evm"
+                    symbol: "MATIC"
+                    precision: 18
+                    color: "#8247E5"
                     explorer: "https://polygonscan.com"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+                    explorerAddressLink: "https://polygonscan.com/address/"
+                    explorerTxLink: "https://polygonscan.com/tx/"
+                    nativeAssetId: "eip155:137/slip44:966"
+                timestamp: 1700000000
 
   /v1/chains/count:
     get:
       operationId: getChainsCount
-      summary: Get total chain count
+      summary: Get chain count
       description: Returns the total number of supported blockchain networks.
       tags:
         - Chains
@@ -75,10 +86,10 @@ paths:
                 type: object
                 properties:
                   count:
-                    type: integer
+                    type: number
                     example: 42
-        "401":
-          $ref: "#/components/responses/Unauthorized"
+                  timestamp:
+                    type: number
 
   /v1/assets:
     get:
@@ -95,26 +106,24 @@ paths:
           schema:
             type: string
             example: "eip155:1"
-        - name: search
-          in: query
-          description: Search by name or symbol
-          required: false
-          schema:
-            type: string
         - name: limit
           in: query
-          description: Max results (default 50, max 200)
+          description: Max results per page
           required: false
           schema:
-            type: integer
-            default: 50
+            type: number
+            default: 100
+            minimum: 1
+            maximum: 1000
+            example: 100
         - name: offset
           in: query
           description: Pagination offset
           required: false
           schema:
-            type: integer
+            type: number
             default: 0
+            minimum: 0
       responses:
         "200":
           description: Successfully retrieved assets
@@ -127,20 +136,14 @@ paths:
                     type: array
                     items:
                       $ref: "#/components/schemas/Asset"
-                  total:
-                    type: integer
-                  limit:
-                    type: integer
-                  offset:
-                    type: integer
-        "401":
-          $ref: "#/components/responses/Unauthorized"
+                  timestamp:
+                    type: number
 
   /v1/assets/{assetId}:
     get:
       operationId: getAssetById
-      summary: Get asset details
-      description: Returns detailed information about a specific asset including market data.
+      summary: Get asset by ID
+      description: Returns detailed information about a specific asset.
       tags:
         - Assets
       parameters:
@@ -150,6 +153,7 @@ paths:
           required: true
           schema:
             type: string
+            minLength: 1
             example: "eip155:1/slip44:60"
       responses:
         "200":
@@ -157,9 +161,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AssetDetailed"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
+                $ref: "#/components/schemas/Asset"
         "404":
           description: Asset not found
 
@@ -170,49 +172,64 @@ paths:
       description: Queries multiple DEX aggregators and returns the best available rates.
       tags:
         - Swaps
+      security:
+        - ApiKeyAuth: []
       parameters:
-        - name: sellAsset
+        - name: sellAssetId
           in: query
           description: CAIP-19 ID of asset to sell
           required: true
           schema:
             type: string
             example: "eip155:1/slip44:60"
-        - name: buyAsset
+        - name: buyAssetId
           in: query
           description: CAIP-19 ID of asset to buy
           required: true
           schema:
             type: string
-        - name: sellAmount
+            example: "eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+        - name: sellAmountCryptoBaseUnit
           in: query
           description: Amount to sell in base units (wei, satoshi, etc.)
           required: true
           schema:
             type: string
+            pattern: "^\\d+$"
             example: "1000000000000000000"
+        - name: slippageTolerancePercentageDecimal
+          in: query
+          description: Slippage tolerance as a decimal (e.g. "0.01" for 1%)
+          required: false
+          schema:
+            type: string
+            pattern: "^(?:\\d+)(?:\\.\\d+)?$"
+        - name: allowMultiHop
+          in: query
+          description: Allow multi-hop swaps for better rates
+          required: false
+          schema:
+            type: boolean
+            default: true
       responses:
         "200":
           description: Successfully retrieved swap rates
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  rates:
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/SwapRate"
+                $ref: "#/components/schemas/RateResponse"
         "401":
           $ref: "#/components/responses/Unauthorized"
 
   /v1/swap/quote:
     post:
       operationId: postSwapQuote
-      summary: Generate swap quote
+      summary: Get executable quote
       description: Generates executable transaction data for a swap. Quotes expire after a short time window.
       tags:
         - Swaps
+      security:
+        - ApiKeyAuth: []
       requestBody:
         required: true
         content:
@@ -225,12 +242,9 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  quote:
-                    $ref: "#/components/schemas/SwapQuote"
-                  transaction:
-                    $ref: "#/components/schemas/Transaction"
+                $ref: "#/components/schemas/QuoteResponse"
+        "400":
+          description: Invalid request
         "401":
           $ref: "#/components/responses/Unauthorized"
 
@@ -245,6 +259,17 @@ components:
   schemas:
     Chain:
       type: object
+      required:
+        - chainId
+        - name
+        - type
+        - symbol
+        - precision
+        - color
+        - explorer
+        - explorerAddressLink
+        - explorerTxLink
+        - nativeAssetId
       properties:
         chainId:
           type: string
@@ -253,124 +278,280 @@ components:
         name:
           type: string
           example: "Ethereum"
-        nativeCurrency:
+        type:
           type: string
+          enum: [evm, utxo, cosmos, solana, tron, sui, near, starknet, ton]
+          description: The type of blockchain network
+          example: "evm"
+        symbol:
+          type: string
+          description: Native currency symbol
           example: "ETH"
+        precision:
+          type: number
+          description: Decimal precision of the native currency
+          example: 18
+        color:
+          type: string
+          description: Brand color hex code
+          example: "#627EEA"
+        networkColor:
+          type: string
+          description: Network-specific color (optional)
+        icon:
+          type: string
+          description: URL to chain icon
+        networkIcon:
+          type: string
+          description: URL to network-specific icon (optional)
         explorer:
           type: string
           example: "https://etherscan.io"
+        explorerAddressLink:
+          type: string
+          description: Base URL for address lookups
+          example: "https://etherscan.io/address/"
+        explorerTxLink:
+          type: string
+          description: Base URL for transaction lookups
+          example: "https://etherscan.io/tx/"
+        nativeAssetId:
+          type: string
+          description: CAIP-19 identifier of the chain's native asset
+          example: "eip155:1/slip44:60"
 
     Asset:
       type: object
+      required:
+        - assetId
+        - chainId
+        - name
+        - symbol
+        - precision
+        - color
+        - icon
+        - explorer
+        - explorerAddressLink
+        - explorerTxLink
       properties:
         assetId:
           type: string
           description: CAIP-19 asset identifier
           example: "eip155:1/slip44:60"
+        chainId:
+          type: string
+          description: CAIP-2 chain identifier
+          example: "eip155:1"
         name:
           type: string
           example: "Ethereum"
         symbol:
           type: string
           example: "ETH"
-        decimals:
-          type: integer
+        precision:
+          type: number
+          description: Decimal precision
           example: 18
-        chainId:
+        color:
           type: string
-          example: "eip155:1"
+          description: Brand color hex code
+          example: "#627EEA"
         icon:
           type: string
+          description: URL to asset icon
+        explorer:
+          type: string
+          example: "https://etherscan.io"
+        explorerAddressLink:
+          type: string
+          description: Base URL for address lookups
+          example: "https://etherscan.io/address/"
+        explorerTxLink:
+          type: string
+          description: Base URL for transaction lookups
+          example: "https://etherscan.io/tx/"
 
-    AssetDetailed:
-      allOf:
-        - $ref: "#/components/schemas/Asset"
-        - type: object
-          properties:
-            marketData:
-              type: object
-              properties:
-                price:
-                  type: string
-                  example: "3245.67"
-                marketCap:
-                  type: string
-                volume24h:
-                  type: string
-                changePercent24h:
-                  type: string
+    RateResponse:
+      type: object
+      required:
+        - rates
+        - timestamp
+        - expiresAt
+      properties:
+        rates:
+          type: array
+          items:
+            $ref: "#/components/schemas/Rate"
+        timestamp:
+          type: number
+        expiresAt:
+          type: number
 
-    SwapRate:
+    Rate:
       type: object
       properties:
-        source:
+        swapperName:
           type: string
-          example: "0x"
-        buyAmount:
-          type: string
-        sellAmount:
-          type: string
+          description: Name of the DEX aggregator or swapper
+          example: "THORChain"
         rate:
           type: string
           example: "3245.67"
-        estimatedGas:
+        buyAmountCryptoBaseUnit:
           type: string
+          description: Amount of buy asset received in base units
+        sellAmountCryptoBaseUnit:
+          type: string
+          description: Amount of sell asset spent in base units
+        steps:
+          type: number
+          description: Number of steps in the swap route
+        affiliateBps:
+          type: string
+          description: Affiliate fee in basis points
+        estimatedExecutionTimeMs:
+          type: number
+          description: Estimated execution time in milliseconds
+        priceImpactPercentageDecimal:
+          type: string
+          description: Price impact as a decimal percentage
+        networkFeeCryptoBaseUnit:
+          type: string
+          description: Network fee in base units
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+            message:
+              type: string
 
     SwapQuoteRequest:
       type: object
-      required: [sellAsset, buyAsset, sellAmount, senderAddress, receiverAddress]
+      required:
+        - sellAssetId
+        - buyAssetId
+        - sellAmountCryptoBaseUnit
+        - receiveAddress
+        - swapperName
       properties:
-        sellAsset:
+        sellAssetId:
           type: string
+          description: CAIP-19 ID of asset to sell
           example: "eip155:1/slip44:60"
-        buyAsset:
+        buyAssetId:
           type: string
-        sellAmount:
+          description: CAIP-19 ID of asset to buy
+        sellAmountCryptoBaseUnit:
           type: string
-        senderAddress:
+          description: Amount to sell in base units
+        receiveAddress:
           type: string
-        receiverAddress:
+          description: Address to receive the bought asset
+        swapperName:
           type: string
-        slippage:
+          description: Name of the swapper to use (from rates response)
+        sendAddress:
+          type: string
+          description: Address sending the sell asset (optional)
+        slippageTolerancePercentageDecimal:
+          type: string
+          description: Slippage tolerance as a decimal
+        allowMultiHop:
+          type: boolean
+          description: Allow multi-hop swaps
+          default: true
+        accountNumber:
           type: number
-          default: 0.5
-        preferredSource:
-          type: string
+          description: Account number for UTXO-based chains
+          default: 0
+          nullable: true
 
-    SwapQuote:
+    QuoteResponse:
       type: object
+      required:
+        - quoteId
+        - swapperName
+        - rate
+        - sellAsset
+        - buyAsset
+        - sellAmountCryptoBaseUnit
+        - buyAmountBeforeFeesCryptoBaseUnit
+        - buyAmountAfterFeesCryptoBaseUnit
+        - affiliateBps
+        - steps
+        - expiresAt
       properties:
-        sellAsset:
+        quoteId:
           type: string
-        buyAsset:
+          format: uuid
+          description: Unique quote identifier
+        swapperName:
           type: string
-        sellAmount:
-          type: string
-        buyAmount:
-          type: string
+          description: Name of the swapper
         rate:
           type: string
+          description: Exchange rate
+        sellAsset:
+          $ref: "#/components/schemas/Asset"
+        buyAsset:
+          $ref: "#/components/schemas/Asset"
+        sellAmountCryptoBaseUnit:
+          type: string
+        buyAmountBeforeFeesCryptoBaseUnit:
+          type: string
+        buyAmountAfterFeesCryptoBaseUnit:
+          type: string
+        affiliateBps:
+          type: string
+          description: Affiliate fee in basis points
+        slippageTolerancePercentageDecimal:
+          type: string
+        steps:
+          type: array
+          items:
+            $ref: "#/components/schemas/QuoteStep"
+        expiresAt:
+          type: number
+          description: Unix timestamp when the quote expires
+
+    QuoteStep:
+      type: object
+      required:
+        - sellAsset
+        - buyAsset
+        - sellAmountCryptoBaseUnit
+        - buyAmountAfterFeesCryptoBaseUnit
+        - allowanceContract
+        - source
+      properties:
+        sellAsset:
+          $ref: "#/components/schemas/Asset"
+        buyAsset:
+          $ref: "#/components/schemas/Asset"
+        sellAmountCryptoBaseUnit:
+          type: string
+        buyAmountAfterFeesCryptoBaseUnit:
+          type: string
+        allowanceContract:
+          type: string
+          description: Contract address for token approval
+        estimatedExecutionTimeMs:
+          type: number
         source:
           type: string
-        estimatedGas:
-          type: string
-        expiresAt:
-          type: string
-          format: date-time
-
-    Transaction:
-      type: object
-      properties:
-        to:
-          type: string
-        value:
-          type: string
-        data:
-          type: string
-        gasLimit:
-          type: string
-        chainId:
-          type: integer
+          description: The DEX or protocol used for this step
+        transactionData:
+          type: object
+          properties:
+            to:
+              type: string
+            data:
+              type: string
+            value:
+              type: string
+            gasLimit:
+              type: string
 
     Error:
       type: object
