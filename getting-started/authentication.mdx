@@ -7,11 +7,11 @@ icon: "lock"
 
 ## API Key
 
-Swap endpoints (`/v1/swap/rates` and `/v1/swap/quote`) require your API key in the \`X-API-Key\` header. Chains and assets endpoints are publicly accessible without authentication.
+Swap endpoints (`/v1/swap/rates` and `/v1/swap/quote`) require your API key in the `X-API-Key` header. Chains and assets endpoints are publicly accessible without authentication.
 
 ```bash
 curl -X GET "https://api.shapeshift.com/v1/swap/rates?sellAssetId=eip155:1/slip44:60&buyAssetId=eip155:1/erc20:0xa0b86991c...&sellAmountCryptoBaseUnit=1000000000000000000" \
-  -H "X-API-Key: sk_live_your_api_key_here"
+  -H "X-API-Key: your-api-key"
 ```
 
 <Warning>
@@ -25,7 +25,7 @@ curl -X GET "https://api.shapeshift.com/v1/swap/rates?sellAssetId=eip155:1/slip4
     Store your API key in environment variables rather than hardcoding it:
 
     ```bash .env
-    SHAPESHIFT_API_KEY=sk_live_your_api_key_here
+    SHAPESHIFT_API_KEY=your-api-key
     ```
 
     ```javascript
@@ -44,11 +44,6 @@ curl -X GET "https://api.shapeshift.com/v1/swap/rates?sellAssetId=eip155:1/slip4
       const rates = await shapeshift.swap.getRates(req.query);
       res.json(rates);
     });
-
-    // Never in the browser
-    // fetch('https://api.shapeshift.com/v1/swap/rates', {
-    //   headers: { 'X-API-Key': 'sk_live_...' }
-    // });
     ```
   </Accordion>
 
@@ -57,51 +52,6 @@ curl -X GET "https://api.shapeshift.com/v1/swap/rates?sellAssetId=eip155:1/slip4
   </Accordion>
 </AccordionGroup>
 
-## Rate Limiting
-
-API requests are rate-limited to **100 requests per minute** per API key. If you exceed this limit, you'll receive a \`429 Too Many Requests\` response:
-
-```json
-{
-  "error": {
-    "code": "RATE_LIMITED",
-    "message": "Rate limit exceeded. Please wait and try again."
-  }
-}
-```
-
-<Tip>
-  Implement exponential backoff in your retry logic to handle rate limiting gracefully.
-</Tip>
-
-## Error Responses
-
-### 401 Unauthorized
-
-Returned when the API key is missing or invalid:
-
-```json
-{
-  "error": {
-    "code": "UNAUTHORIZED",
-    "message": "Invalid or missing API key"
-  }
-}
-```
-
-### 403 Forbidden
-
-Returned when the API key doesn't have permissions for the requested resource:
-
-```json
-{
-  "error": {
-    "code": "FORBIDDEN",
-    "message": "API key does not have access to this resource"
-  }
-}
-```
-
 ## Getting an API Key
 
 <Steps>
@@ -109,7 +59,7 @@ Returned when the API key doesn't have permissions for the requested resource:
     Create an account on the [ShapeShift developer portal](https://shapeshift.com/developers).
   </Step>
   <Step title="Create a project">
-    Set up a new project and configure your allowed origins and rate limits.
+    Set up a new project and configure your allowed origins.
   </Step>
   <Step title="Generate a key">
     Generate an API key from your project dashboard. Copy it immediately — it won't be shown again.
