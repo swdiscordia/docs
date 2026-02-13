@@ -7,61 +7,13 @@ icon: "lock"
 
 ## API Key
 
-Swap endpoints (`/v1/swap/rates` and `/v1/swap/quote`) require your API key in the `X-API-Key` header. Chains and assets endpoints are publicly accessible without authentication.
+Include your API key in the `X-API-Key` header for all swap endpoints. Chains and assets endpoints are publicly accessible without authentication.
 
 ```bash
-curl -X GET "https://api.shapeshift.com/v1/swap/rates?sellAssetId=eip155:1/slip44:60&buyAssetId=eip155:1/erc20:0xa0b86991c...&sellAmountCryptoBaseUnit=1000000000000000000" \
+curl -X GET "https://api.shapeshift.com/v1/swap/rates?sellAssetId=eip155:1/slip44:60&buyAssetId=eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48&sellAmountCryptoBaseUnit=1000000000000000000" \
   -H "X-API-Key: your-api-key"
 ```
 
 <Warning>
-  **Keep your API key secret.** Never expose it in client-side code, public repositories, or browser requests. Use environment variables and server-side proxies.
+  **Keep your API key secret.** Never expose it in client-side code, public repositories, or browser requests.
 </Warning>
-
-## Best Practices
-
-<AccordionGroup>
-  <Accordion title="Use environment variables" icon="key">
-    Store your API key in environment variables rather than hardcoding it:
-
-    ```bash .env
-    SHAPESHIFT_API_KEY=your-api-key
-    ```
-
-    ```javascript
-    const client = new ShapeShiftClient({
-      apiKey: process.env.SHAPESHIFT_API_KEY,
-    });
-    ```
-  </Accordion>
-
-  <Accordion title="Server-side only" icon="server">
-    Always make API calls from your server, never from the browser. If you need to expose swap data to your frontend, create a proxy endpoint on your server.
-
-    ```javascript
-    // Server-side (Express example)
-    app.get('/api/rates', async (req, res) => {
-      const rates = await shapeshift.swap.getRates(req.query);
-      res.json(rates);
-    });
-    ```
-  </Accordion>
-
-  <Accordion title="Rotate keys regularly" icon="arrows-rotate">
-    Periodically rotate your API keys via the developer portal. If you suspect a key has been compromised, revoke it immediately.
-  </Accordion>
-</AccordionGroup>
-
-## Getting an API Key
-
-<Steps>
-  <Step title="Sign up">
-    Create an account on the [ShapeShift developer portal](https://shapeshift.com/developers).
-  </Step>
-  <Step title="Create a project">
-    Set up a new project and configure your allowed origins.
-  </Step>
-  <Step title="Generate a key">
-    Generate an API key from your project dashboard. Copy it immediately — it won't be shown again.
-  </Step>
-</Steps>
