@@ -1,6 +1,6 @@
 ---
 title: "ShapeShift"
-description: "A unified API for cross-chain swaps, asset management, and blockchain data across every major ecosystem."
+description: "The ShapeShift Public API enables developers to integrate multi-chain swap functionality into their applications."
 ---
 
 <Warning>
@@ -9,66 +9,43 @@ description: "A unified API for cross-chain swaps, asset management, and blockch
 
 ## Quick Start
 
-### Installation
+Fetch the list of supported chains with a single call:
 
-<CodeGroup>
-```bash npm
-npm install @shapeshift/api-client
+```bash
+curl -X GET "https://api.shapeshift.com/v1/chains" \
+  -H "Content-Type: application/json"
 ```
 
-```bash yarn
-yarn add @shapeshift/api-client
-```
+Get swap rates across all available swappers:
 
-```bash pnpm
-pnpm add @shapeshift/api-client
-```
-</CodeGroup>
-
-### Basic Setup
-
-Initialize the client with your API key and start querying chains, assets, and swap rates:
-
-```typescript
-import { ShapeShiftAPI } from "@shapeshift/api-client";
-
-const client = new ShapeShiftAPI({
-  apiKey: "your-api-key",
-});
-
-// List all supported chains
-const chains = await client.getChains();
-console.log(chains);
-
-// Get swap rates
-const rates = await client.getSwapRates({
-  sellAssetId: "eip155:1/slip44:60",                // ETH on Ethereum
-  buyAssetId: "eip155:137/slip44:966",               // MATIC on Polygon
-  sellAmountCryptoBaseUnit: "1000000000000000000",   // 1 ETH in wei
-});
-console.log(rates);
+```bash
+curl -X GET "https://api.shapeshift.com/v1/swap/rates?\
+sellAssetId=eip155:1/slip44:60&\
+buyAssetId=eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48&\
+sellAmountCryptoBaseUnit=1000000000000000000" \
+  -H "X-API-Key: your-api-key"
 ```
 
 ## Core Components
 
 <CardGroup cols={2}>
   <Card title="Chains" icon="link" href="/api-reference/overview">
-    Query supported blockchains, their metadata, and network details across every major ecosystem.
+    Query supported blockchains, their metadata, and network details.
   </Card>
   <Card title="Assets" icon="coins" href="/api-reference/overview">
     Browse and search supported assets using the CAIP-19 standard for universal asset identification.
   </Card>
   <Card title="Swaps" icon="arrows-rotate" href="/api-reference/overview">
-    Get real-time swap rates and generate optimized quotes for cross-chain token swaps.
+    Get real-time swap rates and generate executable quotes for cross-chain token swaps.
   </Card>
   <Card title="Authentication" icon="key" href="/getting-started/authentication">
-    Secure your integration with API key authentication and understand rate limiting.
+    Secure your integration with API key authentication.
   </Card>
 </CardGroup>
 
 ## Key Features
 
-- **Multi-Chain Support** — Access 20+ blockchains through a single, unified API
+- **Multi-Chain Support** — Access multiple blockchains through a single, unified API
 - **CAIP-19 Asset IDs** — Industry-standard asset identification across all chains
 - **Real-Time Rates** — Live swap rates with optimized routing across DEXs
 - **RESTful API** — Clean, predictable endpoints with consistent JSON responses
